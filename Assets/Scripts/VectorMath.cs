@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem.XR;
 
 public static class VectorMath
 {
@@ -87,5 +88,42 @@ public static class VectorMath
             planeNormal.Normalize();
 
         return vector - planeNormal * Vector2.Dot(vector, planeNormal);
+    }
+
+    public static float GetAngle(Vector2 vectorA, Vector2 vectorB)
+    {
+        // Calculate the angle (always positive, 0–180)
+        float angle = Vector2.Angle(vectorA, vectorB);
+
+        // In 2D, the "cross product" is a scalar (z-component of 3D cross product)
+        float cross = vectorA.x * vectorB.y - vectorA.y * vectorB.x;
+
+        // Use the sign of the cross to determine clockwise (-) or counterclockwise (+)
+        float sign = Mathf.Sign(cross);
+
+        // Combine angle and sign (-180 to +180)
+        float signedAngle = angle * sign;
+
+        return signedAngle;
+    }
+
+    public static Vector2 ProjectOnEdge(Vector2 vector, Vector2 normal)
+    {
+        float sqrMag = Vector2.Dot(normal, normal);
+        if (sqrMag < Mathf.Epsilon)
+            return vector;
+
+        float dot = Vector2.Dot(vector, normal);
+        return vector - (dot / sqrMag) * normal;
+    }
+
+    public static Vector2 Project(Vector2 vector, Vector2 onNormal)
+    {
+        float sqrMag = onNormal.sqrMagnitude;
+        if (sqrMag < Mathf.Epsilon)
+            return Vector2.zero;
+
+        float dot = Vector2.Dot(vector, onNormal);
+        return (dot / sqrMag) * onNormal;
     }
 }
